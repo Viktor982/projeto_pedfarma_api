@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\User;
+use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
@@ -35,7 +36,21 @@ class UserController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        if(empty($request->name) || empty($request->email) || empty($request->password)){
+            return response()->json("Campos obrigatórios faltando", 202);
+        }
+
+        if(!empty($this->model->where('email',$request->email)->get()->first())){
+            return response()->json("Email já cadastrado", 202);
+        }
+
+        $this->model->create([
+            'name' => $request->name,
+            'email' => $request->email,
+            'password' => Hash::make($request->password),
+        ]);
+        
+        return response()->json('Ok', 200);
     }
 
     /**
