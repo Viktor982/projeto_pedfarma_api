@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Sale;
+use App\Models\Customer;
+use App\Models\Provider;
 
 class SaleController extends Controller
 {
@@ -14,8 +16,20 @@ class SaleController extends Controller
      */
     protected $model;
 
-    public function __construct(Sale $model){
+    /**
+     * @var Customer 
+     */
+    protected $customerModel;
+
+    /**
+     * @var Provider 
+     */
+    protected $providerModel;
+
+    public function __construct(Sale $model, Customer $customerModel, Provider $providerModel){
         $this->model = $model;
+        $this->customerModel = $customerModel;
+        $this->providerModel = $providerModel;
     }
 
     /**
@@ -38,6 +52,14 @@ class SaleController extends Controller
     { 
         if(empty($request->unitary_value) || empty($request->quantity) || empty($request->amount) || empty($request->customer_id) || empty($request->provider_id)){
             return response()->json("Campos obrigatórios faltando", 202);
+        }
+
+        if(empty($this->customerModel->find($request->customer_id))){
+            return response()->json("Cliente não encontrado", 202);
+        }
+
+        if(empty($this->providerModel->find($request->provider_id))){
+            return response()->json("Fornecedor não encontrado", 202);
         }
 
         $this->model->create(array_merge($request->all(), ['user_id' => auth('api')->user()->id]));
