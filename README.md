@@ -4,3 +4,6 @@
 - Configure the .env file and run `php artisan migrate`
 - `php artisan key:generate`
 - `php artisan jwt:secret`
+
+## Run
+- `php artisan serve` 
